@@ -1,3 +1,5 @@
+from representations import IntegerRepresentation
+
 def extendedEuclidAlgorithm(a, b):
     """ 
     Takes two objects of the same type that inherits from the class DivisibleObject,
@@ -6,19 +8,20 @@ def extendedEuclidAlgorithm(a, b):
     Returns a tupple (gcd, s, t) where gcd is the gcd(a,b), and s, t satisfy the
     equation s*a + t*b = gcd(a,b)
     """
-    s1, s2 = 1, 0
-    t1, t2 = 0, 1
-    while b != 0:
-        quotient = a // b
-        remainder = a % b
+    s1, s2 = a.get_multiplicative_identity(), a.get_zero_element()
+    t1, t2 = a.get_zero_element() , a.get_multiplicative_identity()
+    while not b.is_zero():
+        quotient, remainder = divmod(a, b)
+        #quotient = a / b
+        #remainder = a % b
         a = b
         b = remainder
         s1, s2 = s2, s1 - quotient*s2
         t1, t2 = t2, t1 - quotient*t2
     return a, s1, t1
 
-a = 102
-b = 38
-answer, s, t = gcd(a,b)
+a = IntegerRepresentation(102)
+b = IntegerRepresentation(38)
+answer, s, t = extendedEuclidAlgorithm(a,b)
 print(answer, s*a+t*b)
 assert s*a+t*b == answer
