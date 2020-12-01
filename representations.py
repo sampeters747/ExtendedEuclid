@@ -111,7 +111,10 @@ class GaussianIntegerRepresentation(DivisibleObject):
     def __divmod__(self, other):
         """ 
         Performs the division algorithm on self and other, returning a tupple
-        (quotient, remainder) 
+        (quotient, remainder)
+
+        Based on: https://www.khanacademy.org/math/precalculus/x9e81a4f98389efdf:complex/x9e81a4f98389efdf:complex-div/a/dividing-complex-numbers-review
+        And https://fermatslasttheorem.blogspot.com/2005/06/division-algorithm-for-gaussian.html
         """
         # We're representing division as a fraction with two variables
         numerator = self
@@ -122,12 +125,11 @@ class GaussianIntegerRepresentation(DivisibleObject):
         # This gets us a real number in the denominator
         numerator = numerator * denom_conjugate
         denominator = denominator * denom_conjugate
-        
-
-
-
-
-
+        q1, r1 = divmod(numerator.a, denominator.a)
+        q2, r2 = divmod(numerator.b, denominator.a)
+        quotient = GaussianIntegerRepresentation(q1, q2)
+        remainder = self-quotient*other
+        return (quotient, remainder)
 
     def __truediv__(self, other):
         """ Performs division between two gausian integers.
@@ -148,12 +150,15 @@ class GaussianIntegerRepresentation(DivisibleObject):
         return IntegerRepresentation(new_value)
 
     def __sub__(self, other):
-        new_value = self.a-other.a
-        return IntegerRepresentation(new_value)
+        real = self.a - other.a
+        imaginary = self.b - other.b
+
+        return GaussianIntegerRepresentation(real, imaginary)
     
     def __add__(self, other):
-        new_value = self.a+other.a
-        return IntegerRepresentation(new_value)
+        real = self.a + other.a
+        imaginary = self.b + other.b
+        return GaussianIntegerRepresentation(real, imaginary)
 
     def is_zero(self) -> bool:
         if self.a == 0:
@@ -180,7 +185,7 @@ class GaussianIntegerRepresentation(DivisibleObject):
 
     def norm(self):
         conjugate = self.conjugate()
-        return sqrt((self*conjugate).a)
+        return (self*conjugate).a
 
 class EisensteinIntegerRepresentation(DivisibleObject):
     def __init__(self, a: int, b: int):
