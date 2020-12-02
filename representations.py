@@ -28,7 +28,7 @@ class DivisibleObject:
     # Helpful methods that aren't strictly necessary, but make the program nicer
     def __str__(self):
         raise NotImplementedError()
-
+    
     def __repr__(self):
         raise NotImplementedError()
 
@@ -85,6 +85,9 @@ class IntegerRepresentation(DivisibleObject):
             return self.a == other.a
         else:
             return self.a == other
+
+    def __gt__(self, other):
+        return self.a > other.a
 
     def get_zero_element(self):
         """ Returns a zero element of the same type """
@@ -186,6 +189,9 @@ class GaussianIntegerRepresentation(DivisibleObject):
 
     def __eq__(self, other):
         return self.a == other.a and self.b == other.b
+
+    def __gt__(self, other):
+        return self.norm() > other.norm()
 
     def conjugate(self):
         return GaussianIntegerRepresentation(self.a, -self.b)
