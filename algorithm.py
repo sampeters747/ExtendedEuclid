@@ -19,9 +19,3 @@ def extendedEuclidAlgorithm(a, b):
         s1, s2 = s2, s1 - quotient*s2
         t1, t2 = t2, t1 - quotient*t2
     return a, s1, t1
-
-a = IntegerRepresentation(102)
-b = IntegerRepresentation(38)
-answer, s, t = extendedEuclidAlgorithm(a,b)
-print(answer, s*a+t*b)
-assert s*a+t*b == answer
