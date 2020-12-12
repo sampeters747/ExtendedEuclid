@@ -24,7 +24,19 @@ s*a + t*b = gcd(a,b).
 
 This works, but adds some unneccesary iteration and complexity when translated to code because it's possible to compute s and t at the same time you're computing the gcd.
 
-To do this we rely on two expressions
+To do this we rely on a few things:
+* First, when we're applying the division algorithm we're getting a sequence of remainders such that 
+r<sub>i-2</sub> = r<sub>i-1</sub>q + r<sub>i</sub>, with our inputs a and b being r<sub>0</sub> and r<sub>1</sub> respectively. Rearranging this expression gives us r<sub>i</sub> = r<sub>i-2</sub> - r<sub>i-1</sub>q
+* Since any remainder can be written as a linear combination of the previous two remainders, there always exists some s<sub>i</sub> and t<sub>i</sub> such that r<sub>i</sub> = s<sub>i</sub>*r<sub>i-2</sub> + t<sub>i</sub>*r<sub>i-1</sub>.
+* If we define s<sub>0</sub> = 1, s<sub>1</sub> = 0, t<sub>0</sub> = 0, and t<sub>1</sub> = 1, we can write base cases r<sub>0</sub> = s<sub>0</sub>*r<sub>i-2</sub> + t<sub>0</sub>*r<sub>i-1</sub> and r<sub>1</sub> = s<sub>1</sub>*r<sub>i-2</sub> + t<sub>1</sub>*r<sub>i-1</sub>. Here you should remember that r<sub>0</sub> = a, and r<sub>1</sub> = b, so we're really just writing a = 1a + 0b and b = 0a + 1b.
+
+Summarizing all fo this, we have a recursive definition of r, where any r<sub>i</sub> can be written in terms of r<sub>i</sub> = s<sub>i</sub>*a + t<sub>i</sub>*b.
+
+Using this definition in the expression r<sub>i</sub> = r<sub>i-2</sub> - r<sub>i-1</sub>q gives us r<sub>i</sub> = (s<sub>i-2</sub>a + t<sub>i-2</sub>b) - (s<sub>i-1</sub>a + t<sub>i-1</sub>b)q.
+
+This expression simplifies to r<sub>i</sub> = (s<sub>i-2</sub> - s<sub>i-1</sub>q<sub>i</sub>)a + (t<sub>i-2</sub> - t<sub>i-1</sub>q<sub>i</sub>)b, and since r<sub>i</sub> = s<sub>i</sub>*a + t<sub>i</sub>*b, s<sub>i</sub> = s<sub>i-2</sub> - s<sub>i-1</sub>q<sub>i</sub> and t<sub>i</sub> = t<sub>i-2</sub> - t<sub>i-1</sub>q<sub>i</sub>.
+
+These recursive definitions of s<sub>i</sub> and t<sub>i</sub> allow us to iteratively generate the bezout's coefficients from the bottom up, at the same we're generating the gcd, resulting in a speed increase of the overall algorithm due to not having to iterate as much, and not having to store the remainders and quotients from every time the division algorithm is run.
 
 ## Usage
 For an interactive demo, run the interactive.py file. Note: When entering gaussian integers, they must always be of the form x+yi or x-yi. Ex. 5+0i, 0-6i, 6 + 7i, 10-20i, etc. The same goes for eisenstein numbers numbers, which must be either in the form x+yw or x-yw, where x and y are integers.
