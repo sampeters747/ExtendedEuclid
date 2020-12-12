@@ -38,16 +38,38 @@ This expression simplifies to r<sub>i</sub> = (s<sub>i-2</sub> - s<sub>i-1</sub>
 
 These recursive definitions of s<sub>i</sub> and t<sub>i</sub> allow us to iteratively generate the bezout's coefficients from the bottom up, at the same we're generating the gcd, resulting in a speed increase of the overall algorithm due to not having to iterate as much, and not having to store the remainders and quotients from every time the division algorithm is run.
 
+## Representing Integers, Gaussian Integers and Eisenstein Integers in Python
+As previously mentioned, I implemented each type of number as it's own class in order to keep the euclidean algorithm function simple. Each class is a subclass of the DivisibleObject parent class, but overwrites all of the parent classes methods. This is done to illustrate the properties each domain shares (they all have division algorithms, zero objects, multiplicative identities, addition, multiplication, etc.).
+
+Even though 2/3 of these are complex numbers, I tried to work with integers as much as possible when implementing them in Python. This avoids any loses in precision associated with multiplying or dividing floating point numbers, and keeps the actual math relatively simple and fast.
+
+### Integers
+Python already has a integer class that implements a division algorithm, but I chose reimplement an integer class in the same style as the gaussian and eisenstein integer classes so it's methods would be uniform with the other classes, which let me call any of the methods that the EisensteinInteger or GaussianInteger classes have in the euclidean algorithm function without worrying about if the given object was an integer. You can see this in line 11 of the function when call the get_multiplicative_identity() function.
+
+### Gaussian Integers
+Gaussian integers are complex numbers of the form a + bi where a and b are integers. The GaussianIntegerRepresentation class stores the a and b as attributes.
+
+To divide two gaussian integers x, y you multiplying the numerator and divisor by the divisor's conjugate. Multiplying any complex number by its conjugate results in a non-imaginary number. So once the divisor is non-imaginary, you can simply divide the resulting numerator by the divisor, giving you a new complex number. However, since we're after a quotient and remainder in Z[i], we need to round the coefficients a, b of the complex number to the nearest integers in order to get a gaussian number q,  and then subtract q*y from x in order to the remainder r.
+
+Note: The process of rounding a and b to the nearest integers works here because complex numbers aren't naturally ordered, so our goal is to instead minimize the size/norm of the remainder, which we do by ensuring the quotient is close to the actual result of division between x,y as possible.
+
+### Eisenstein Integers
+Eisenstein integers are complex numbers of the form a + bw where a and b are integer, and w is one of the cube roots of unity. Like gaussian integers, we don't have to store the full value of the complex number, we can uniquely represent Eisenstein integers by just storing a and b in our EisensteinIntegerRepresentation class. This is especially good because w includes the square root of 3 in it's definition, and representing that in Python would be inherently imprecise.
+
+The division algorithm between Eisenstein integers x, y is similar to the one between gaussian integers. Since eisenstein integers are also complex integers, we can again multiply the numerator and divisor by the divisors conjugate in order to get a real number as the divisor, then divide the numerator by the new divisor in order to get a quasi-eisenstein number of the form a+bw where a and b aren't guaranteed to be integers, and then round a and b of that number in order to get an eisenstein number quotient.
+
 ## Usage
 For an interactive demo, run the interactive.py file. Note: When entering gaussian integers, they must always be of the form x+yi or x-yi. Ex. 5+0i, 0-6i, 6 + 7i, 10-20i, etc. The same goes for eisenstein numbers numbers, which must be either in the form x+yw or x-yw, where x and y are integers.
 
 ## Testing
+Testing this was a unique challenge. While testing the algorithm for integers was trivial because other programs that compute the gcd between integers already exist in Python (so I could just compare results), I wasn't able to find the equivalent for gaussian or eisenstein integers. 
+
+I've done two things that make me reasonably confident my program functions properly for gaussian and eisenstein integers.
+
+First: As previously mentioned, I made the euclidean algorithm implementation is super general, so that I can rigorously check it using integers. Since none show up when using integers, it's highly unlikely any exist in that function given that the function isn't type specific in any way.
+
+Second: To check class specific logic, I checked that the returned bezout's coefficients and gcd satisfied the expression s*a + t*b = gcd(a,b). If there is an error in the multiplication, division algorithm, or addition methods of a class, it's extremely unlikely it'll affect the result in a way where the results will pass this test. To be extra sure, I automated this process in order to check many times.
+
 Assuming you have python3 installed, you run automated tests of this code by navigating to this folder in your favorite terminal/commandline, and running the command:  
 `python3 tests.py --verbose`  
 This normally should take 0-5 seconds to run, and at most 10 seconds. All test cases are stored in the tests.py file. 
-
-## Definitions Z, Z[i], Z[omega] and their representations in Python
-Talks about how all 3 were represented in Python, with emphasis on them all inheriting div/mod operations.
-
-## Misc.
-Not sure what else quite yet.
